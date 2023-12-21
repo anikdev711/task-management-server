@@ -30,6 +30,23 @@ async function run() {
 
 
         const userCollection = client.db("taskManagementDB").collection("users");
+        const taskCollection = client.db("taskManagementDB").collection("tasks");
+
+
+        //tasks related
+
+        app.get('/tasks', async (req, res) => {
+            const cursor = taskCollection.find();
+            const result = await cursor.toArray();
+            res.send(result);
+        })
+
+        app.post('/tasks', async (req, res) => {
+            const task = req.body;
+            const result = await taskCollection.insertOne(task);
+            res.send(result);
+        })
+
 
         //user related
 
@@ -37,13 +54,20 @@ async function run() {
             const cursor = userCollection.find();
             const result = await cursor.toArray();
             res.send(result);
-          })
+        })
 
         app.post('/users', async (req, res) => {
             const user = req.body;
+            const query = {
+                email: user.email
+            }
+            const isUserExist = await userCollection.findOne(query);
+            if (isUserExist) {
+                return res.send({ message: 'user exists', insertedId: null })
+            }
             const result = await userCollection.insertOne(user);
             res.send(result);
-          })
+        })
 
 
 
