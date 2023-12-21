@@ -31,6 +31,8 @@ async function run() {
 
         const userCollection = client.db("taskManagementDB").collection("users");
         const taskCollection = client.db("taskManagementDB").collection("tasks");
+        const ongoingTaskCollection = client.db("taskManagementDB").collection("ongoingtasks");
+        const completeTaskCollection = client.db("taskManagementDB").collection("completetasks");
 
 
         //tasks related
@@ -68,6 +70,65 @@ async function run() {
             const result = await taskCollection.updateOne(filter, task, options);
             res.send(result);
         })
+
+        //ongoing tasks
+
+        // app.put('/ongoingtasks/:id', async (req, res) => {
+        //     const id = req.params.id;
+        //     const filter = {
+        //         _id: new ObjectId(id)
+        //     }
+        //     const options = {
+        //         upsert: true
+        //     }
+        //     const editedTask = req.body;
+        //     const task = {
+        //         $set: {
+        //             email: editedTask.email,
+        //             deadlines: editedTask.deadlines,
+        //             description: editedTask.description,
+        //             priority: editedTask.priority,
+        //             title: editedTask.title
+        //         }
+        //     }
+        //     const result = await ongoingTaskCollection.updateOne(filter, task, options);
+        //     res.send(result);
+        // })
+
+        //ongoing
+
+        app.get('/ongoingtasks', async (req, res) => {
+            const cursor = ongoingTaskCollection.find();
+            const result = await cursor.toArray();
+            res.send(result);
+        })
+
+        app.post('/ongoingtasks', async (req, res) => {
+            const task = req.body;
+            const result = await ongoingTaskCollection.insertOne(task);
+            res.send(result);
+        })
+
+        //completed task
+
+        app.get('/completetasks', async (req, res) => {
+            const cursor = completeTaskCollection.find();
+            const result = await cursor.toArray();
+            res.send(result);
+        })
+
+
+
+        app.post('/completetasks', async (req, res) => {
+            const task = req.body;
+            const result = await completeTaskCollection.insertOne(task);
+            res.send(result);
+        })
+
+
+
+
+
 
         app.delete('/tasks/:id', async (req, res) => {
             const id = req.params.id;
